@@ -115,6 +115,24 @@ Network is deny-all by default. Use `--network-allow` to open specific hosts the
 | `--env KEY=VAL` | — | Environment variable (repeatable) |
 | `--verbose` | off | Diagnostic logging to stderr |
 
+## Custom dependencies
+
+The default `mcp-server` template includes Node.js and Python, which covers most MCP servers. If your server needs additional system packages (e.g., `ffmpeg`, `chromium`, native libraries), build a custom template:
+
+```bash
+# Create a Dockerfile
+echo 'FROM declaw/mcp-server:latest
+RUN apt-get update && apt-get install -y ffmpeg' > Dockerfile
+
+# Build it
+declaw template build --name my-mcp --dockerfile Dockerfile
+
+# Use it
+declaw mcp --template my-mcp -- your-server-command
+```
+
+See `declaw template build --help` for details.
+
 ## Links
 
 - [Full CLI documentation](https://github.com/declaw-ai/declaw-cli)
