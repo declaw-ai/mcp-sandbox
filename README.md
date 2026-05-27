@@ -3,7 +3,7 @@
 Sandbox any MCP server in one line. Firecracker microVM isolation for Claude Desktop, Cursor, Windsurf, Claude Code, and every MCP client.
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/declaw-ai/declaw-cli)](https://github.com/declaw-ai/declaw-cli/releases)
+[![Declaw CLI](https://img.shields.io/github/v/release/declaw-ai/declaw-cli?label=declaw%20cli)](https://github.com/declaw-ai/declaw-cli/releases)
 
 ## Before / After
 
@@ -30,14 +30,14 @@ Your GitHub token is accessible to the MCP server *and* its entire dependency tr
   "mcpServers": {
     "github": {
       "command": "declaw",
-      "args": ["mcp", "--network-allow", "registry.npmjs.org,api.github.com,github.com,codeload.github.com", "--", "npx", "-y", "@modelcontextprotocol/server-github"],
+      "args": ["mcp", "--env", "GITHUB_PERSONAL_ACCESS_TOKEN", "--network-allow", "registry.npmjs.org,api.github.com,github.com,codeload.github.com", "--", "npx", "-y", "@modelcontextprotocol/server-github"],
       "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_..." }
     }
   }
 }
 ```
 
-Same MCP server. Same functionality. But now your token can only reach GitHub — even if a dependency is compromised, it can't exfiltrate credentials anywhere else.
+Same MCP server. Same functionality. But now your token can only reach GitHub — even if a dependency is compromised, it can't exfiltrate credentials anywhere else. Only the env vars you explicitly forward with `--env` reach the sandbox.
 
 ## Why
 
@@ -96,7 +96,7 @@ Config path: `~/Library/Application Support/Claude/claude_desktop_config.json` (
   "mcpServers": {
     "github": {
       "command": "declaw",
-      "args": ["mcp", "--network-allow", "registry.npmjs.org,api.github.com,github.com,codeload.github.com", "--", "npx", "-y", "@modelcontextprotocol/server-github"],
+      "args": ["mcp", "--env", "GITHUB_PERSONAL_ACCESS_TOKEN", "--network-allow", "registry.npmjs.org,api.github.com,github.com,codeload.github.com", "--", "npx", "-y", "@modelcontextprotocol/server-github"],
       "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_..." }
     }
   }
@@ -107,10 +107,14 @@ Config path: `~/Library/Application Support/Claude/claude_desktop_config.json` (
 
 Config path: `~/.cursor/mcp.json` — same JSON structure as above.
 
+### Windsurf
+
+Config path: `~/.codeium/windsurf/mcp_config.json` — same JSON structure as above.
+
 ### Claude Code
 
 ```bash
-claude mcp add github -e GITHUB_PERSONAL_ACCESS_TOKEN=ghp_... -- declaw mcp --network-allow registry.npmjs.org,api.github.com,github.com,codeload.github.com -- npx -y @modelcontextprotocol/server-github
+claude mcp add github -e GITHUB_PERSONAL_ACCESS_TOKEN=ghp_... -- declaw mcp --env GITHUB_PERSONAL_ACCESS_TOKEN --network-allow registry.npmjs.org,api.github.com,github.com,codeload.github.com -- npx -y @modelcontextprotocol/server-github
 ```
 
 ## Examples
@@ -134,7 +138,7 @@ Network is deny-all by default. Use `--network-allow` to open specific hosts the
 | `--network-allow <hosts>` | deny-all | Comma-separated outbound hostname allowlist |
 | `--template <name>` | `mcp-server` | Sandbox template (default includes Node.js + Python) |
 | `--timeout <seconds>` | `86400` | Sandbox timeout (default 24h) |
-| `--env KEY=VAL` | — | Environment variable (repeatable) |
+| `--env KEY` or `--env KEY=VAL` | — | Environment variable to forward (repeatable). `KEY` reads from host env; `KEY=VAL` sets explicitly. |
 | `--verbose` | off | Diagnostic logging to stderr |
 
 ## Custom dependencies
@@ -146,11 +150,11 @@ The default `mcp-server` template includes Node.js and Python, which covers most
 echo 'FROM declaw/mcp-server:latest
 RUN apt-get update && apt-get install -y ffmpeg' > Dockerfile
 
-# Build it
-declaw template build --name my-mcp --dockerfile Dockerfile
+# Build it (returns a template ID)
+declaw template build --dockerfile Dockerfile
 
-# Use it
-declaw mcp --template my-mcp -- your-server-command
+# Use the template ID from the build output
+declaw mcp --template <template-id> -- your-server-command
 ```
 
 See `declaw template build --help` for details.
