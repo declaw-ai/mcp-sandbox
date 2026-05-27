@@ -110,7 +110,7 @@ Network is deny-all by default. Use `--network-allow` to open specific hosts the
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--network-allow <hosts>` | deny-all | Comma-separated outbound hostname allowlist |
-| `--template <name>` | `base` | Sandbox template (`node` for npx servers, `python` for pip servers) |
+| `--template <name>` | `mcp-server` | Sandbox template (default includes Node.js + Python) |
 | `--timeout <seconds>` | `86400` | Sandbox timeout (default 24h) |
 | `--env KEY=VAL` | — | Environment variable (repeatable) |
 | `--verbose` | off | Diagnostic logging to stderr |
