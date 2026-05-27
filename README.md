@@ -110,7 +110,7 @@ Config path: `~/.cursor/mcp.json` — same JSON structure as above.
 ### Claude Code
 
 ```bash
-claude mcp add github -- declaw mcp --network-allow registry.npmjs.org,api.github.com,github.com,codeload.github.com -- npx -y @modelcontextprotocol/server-github
+claude mcp add github -e GITHUB_PERSONAL_ACCESS_TOKEN=ghp_... -- declaw mcp --network-allow registry.npmjs.org,api.github.com,github.com,codeload.github.com -- npx -y @modelcontextprotocol/server-github
 ```
 
 ## Examples
