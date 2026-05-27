@@ -76,11 +76,13 @@ go install github.com/declaw-ai/declaw-cli/cmd/declaw@latest
 # https://github.com/declaw-ai/declaw-cli/releases
 ```
 
-Then authenticate:
+Then sign up and authenticate:
 
 ```bash
+# 1. Create a free account at https://console.declaw.ai
+# 2. Copy your API key from the dashboard
+# 3. Authenticate:
 declaw auth login
-# or: export DECLAW_API_KEY=your-key
 ```
 
 ## Client Setup
