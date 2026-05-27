@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "declaw",
+      "args": ["mcp", "--template", "node", "--network-allow", "registry.npmjs.org", "--", "npx", "-y", "@modelcontextprotocol/server-filesystem", "/home/user"],
+      "env": {}
+    }
+  }
+}

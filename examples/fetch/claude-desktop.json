@@ -2,7 +2,7 @@
   "mcpServers": {
     "fetch": {
       "command": "declaw",
-      "args": ["mcp", "--template", "python", "--network-allow", "pypi.org,files.pythonhosted.org,*", "--", "pip install mcp-server-fetch -q && python3 -m mcp_server_fetch"],
+      "args": ["mcp", "--template", "python", "--network-allow", "*", "--", "pip install mcp-server-fetch -q && python3 -m mcp_server_fetch"],
       "env": {}
     }
   }

@@ -11,10 +11,9 @@ No API key required.
 
 ## Network
 
-This server fetches arbitrary URLs, so `--network-allow` includes `*` (all outbound).
-The `pypi.org` and `files.pythonhosted.org` entries are needed for the initial `pip install`.
+This server fetches arbitrary URLs, so `--network-allow` uses `*` (all outbound). This also covers the initial `pip install` from PyPI.
 
-If you want to restrict fetching to specific domains, replace `*` with a comma-separated list (e.g., `pypi.org,files.pythonhosted.org,docs.python.org,en.wikipedia.org`).
+To restrict fetching to specific domains, replace `*` with a comma-separated list (e.g., `pypi.org,files.pythonhosted.org,docs.python.org,en.wikipedia.org`).
 
 ## Template
 

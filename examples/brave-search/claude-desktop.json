@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "brave-search": {
+      "command": "declaw",
+      "args": ["mcp", "--template", "node", "--network-allow", "registry.npmjs.org,api.search.brave.com", "--env", "BRAVE_API_KEY=YOUR_API_KEY", "--", "npx", "-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {}
+    }
+  }
+}

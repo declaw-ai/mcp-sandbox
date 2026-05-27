@@ -94,7 +94,10 @@ claude mcp add github -- declaw mcp --template node --network-allow api.github.c
 See [`examples/`](examples/) for ready-to-use configs for popular MCP servers:
 
 - [`github`](examples/github/) — GitHub API access (repos, issues, PRs, code search)
+- [`brave-search`](examples/brave-search/) — Web search via Brave Search API
 - [`fetch`](examples/fetch/) — Web content fetching and conversion
+- [`filesystem`](examples/filesystem/) — Sandboxed file read/write
+- [`memory`](examples/memory/) — Knowledge graph memory (persistent across conversations)
 
 ## How it works
 
