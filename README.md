@@ -21,6 +21,8 @@ Sandbox any MCP server in one line. Firecracker microVM isolation for Claude Des
 }
 ```
 
+Your GitHub token is accessible to the MCP server *and* its entire dependency tree — 847 transitive npm packages running with full host access.
+
 **After** — sandboxed in a Firecracker microVM:
 
 ```json
@@ -28,18 +30,38 @@ Sandbox any MCP server in one line. Firecracker microVM isolation for Claude Des
   "mcpServers": {
     "github": {
       "command": "declaw",
-      "args": ["mcp", "--template", "node", "--network-allow", "api.github.com,github.com,codeload.github.com", "--", "npx", "-y", "@modelcontextprotocol/server-github"],
+      "args": ["mcp", "--network-allow", "registry.npmjs.org,api.github.com,github.com,codeload.github.com", "--", "npx", "-y", "@modelcontextprotocol/server-github"],
       "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_..." }
     }
   }
 }
 ```
 
-One prefix. No code changes. The MCP server runs unchanged inside a hardware-isolated sandbox.
+Same MCP server. Same functionality. But now your token can only reach GitHub — even if a dependency is compromised, it can't exfiltrate credentials anywhere else.
 
 ## Why
 
-MCP servers run as subprocesses with full host access — your files, your SSH keys, your credentials, your network. Claude Desktop Extensions had a [zero-click RCE](https://layerxsecurity.com/blog/claude-desktop-extensions-rce/) rated CVSS 10/10 (LayerX, Feb 2026). Cursor had [CVE-2025-54135](https://www.tenable.com/cve/CVE-2025-54135) and [CVE-2025-54136](https://www.tenable.com/cve/CVE-2025-54136). `declaw mcp` wraps any stdio MCP server in a Firecracker microVM. The server runs unchanged — it just can't touch your machine.
+MCP servers that connect to external APIs handle your most sensitive credentials — GitHub tokens, Slack bot tokens, API keys, database credentials. These servers run as subprocesses with full host access: your files, your SSH keys, your network.
+
+This isn't theoretical:
+- Claude Desktop Extensions had a [zero-click RCE](https://layerxsecurity.com/blog/claude-desktop-extensions-rce/) rated CVSS 10/10 (LayerX, Feb 2026)
+- Cursor had [CVE-2025-54135](https://www.tenable.com/cve/CVE-2025-54135) (CurXecute, CVSS 9.8) and [CVE-2025-54136](https://www.tenable.com/cve/CVE-2025-54136) (MCPoison, CVSS 8.8)
+
+`declaw mcp` wraps any stdio MCP server in a Firecracker microVM with network deny-all by default. The server works identically — it just can't reach anything you didn't explicitly allow.
+
+## When to use this
+
+`declaw mcp` is designed for **MCP servers that talk to external APIs with credentials**:
+
+| Server | Credentials at risk | Why sandbox it |
+|--------|-------------------|----------------|
+| GitHub | `GITHUB_PERSONAL_ACCESS_TOKEN` | Token can only reach `api.github.com`, not exfiltrated elsewhere |
+| Slack | `SLACK_BOT_TOKEN` | Bot token confined to `api.slack.com` |
+| Brave Search | `BRAVE_API_KEY` | API key confined to `api.search.brave.com` |
+| Database | `DATABASE_URL` | Connection string can't be sent to external hosts |
+| Any API server | API keys, tokens, secrets | Network allowlist = credential containment |
+
+**Not a fit for:** MCP servers that need local host access (filesystem, SQLite, etc.) — these need your local files to be useful, which a cloud sandbox intentionally prevents.
 
 ## Install
 
@@ -72,7 +94,7 @@ Config path: `~/Library/Application Support/Claude/claude_desktop_config.json` (
   "mcpServers": {
     "github": {
       "command": "declaw",
-      "args": ["mcp", "--template", "node", "--network-allow", "api.github.com,github.com,codeload.github.com", "--", "npx", "-y", "@modelcontextprotocol/server-github"],
+      "args": ["mcp", "--network-allow", "registry.npmjs.org,api.github.com,github.com,codeload.github.com", "--", "npx", "-y", "@modelcontextprotocol/server-github"],
       "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_..." }
     }
   }
@@ -86,24 +108,22 @@ Config path: `~/.cursor/mcp.json` — same JSON structure as above.
 ### Claude Code
 
 ```bash
-claude mcp add github -- declaw mcp --template node --network-allow api.github.com,github.com,codeload.github.com -- npx -y @modelcontextprotocol/server-github
+claude mcp add github -- declaw mcp --network-allow registry.npmjs.org,api.github.com,github.com,codeload.github.com -- npx -y @modelcontextprotocol/server-github
 ```
 
 ## Examples
 
-See [`examples/`](examples/) for ready-to-use configs for popular MCP servers:
+See [`examples/`](examples/) for ready-to-use configs:
 
-- [`github`](examples/github/) — GitHub API access (repos, issues, PRs, code search)
+- [`github`](examples/github/) — GitHub API (repos, issues, PRs, code search)
 - [`brave-search`](examples/brave-search/) — Web search via Brave Search API
 - [`fetch`](examples/fetch/) — Web content fetching and conversion
-- [`filesystem`](examples/filesystem/) — Sandboxed file read/write
-- [`memory`](examples/memory/) — Knowledge graph memory (persistent across conversations)
 
 ## How it works
 
 `declaw mcp` is a transparent stdio forwarder. It creates a Firecracker microVM, starts the MCP server inside it, and forwards JSON-RPC messages between the MCP client and the sandboxed server. The client doesn't know anything changed. The server doesn't know it's sandboxed.
 
-Network is deny-all by default. Use `--network-allow` to open specific hosts the server needs.
+Network is deny-all by default. Use `--network-allow` to open specific hosts the server needs. This is the key security property: credentials passed to the server can only reach hosts you explicitly permit.
 
 ## Flags
 
@@ -117,7 +137,7 @@ Network is deny-all by default. Use `--network-allow` to open specific hosts the
 
 ## Custom dependencies
 
-The default `mcp-server` template includes Node.js and Python, which covers most MCP servers. If your server needs additional system packages (e.g., `ffmpeg`, `chromium`, native libraries), build a custom template:
+The default `mcp-server` template includes Node.js and Python, which covers most MCP servers. If your server needs additional system packages (e.g., `ffmpeg`, native libraries), build a custom template:
 
 ```bash
 # Create a Dockerfile
