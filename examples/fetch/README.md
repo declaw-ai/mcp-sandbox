@@ -15,6 +15,4 @@ This server fetches arbitrary URLs, so `--network-allow` uses `*` (all outbound)
 
 To restrict fetching to specific domains, replace `*` with a comma-separated list (e.g., `pypi.org,files.pythonhosted.org,docs.python.org,en.wikipedia.org`).
 
-## Template
-
-Uses `--template python` (provides Python 3 + pip).
+Even with `*`, the server is still fully sandboxed — it can't access your host filesystem, SSH keys, or other credentials. The isolation is the VM, the network allowlist is an additional layer.

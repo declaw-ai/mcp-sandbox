@@ -12,10 +12,9 @@ Gives Claude access to GitHub — search repos, read code, create issues, open P
 ## Network
 
 This server needs access to:
+- `registry.npmjs.org` — npm package install
 - `api.github.com` — GitHub API
 - `github.com` — GitHub web
 - `codeload.github.com` — code downloads
 
-## Template
-
-Uses `--template node` (provides Node.js + npx).
+Your `GITHUB_PERSONAL_ACCESS_TOKEN` can only reach these hosts — even if a dependency is compromised, the token can't be exfiltrated elsewhere.

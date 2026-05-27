@@ -2,7 +2,7 @@
   "mcpServers": {
     "github": {
       "command": "declaw",
-      "args": ["mcp", "--template", "node", "--network-allow", "api.github.com,github.com,codeload.github.com", "--", "npx", "-y", "@modelcontextprotocol/server-github"],
+      "args": ["mcp", "--network-allow", "registry.npmjs.org,api.github.com,github.com,codeload.github.com", "--", "npx", "-y", "@modelcontextprotocol/server-github"],
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE"
       }

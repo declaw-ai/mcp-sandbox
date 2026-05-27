@@ -15,6 +15,4 @@ This server needs access to:
 - `registry.npmjs.org` — npm package install
 - `api.search.brave.com` — Brave Search API
 
-## Template
-
-Uses `--template node` (provides Node.js + npx).
+Your `BRAVE_API_KEY` can only reach these hosts — even if a dependency is compromised, the key can't be exfiltrated elsewhere.
