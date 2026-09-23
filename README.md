@@ -137,8 +137,9 @@ Network is deny-all by default. Use `--network-allow` to open specific hosts the
 |------|---------|-------------|
 | `--network-allow <hosts>` | deny-all | Comma-separated outbound hostname allowlist |
 | `--template <name>` | `mcp-server` | Sandbox template (default includes Node.js + Python) |
-| `--timeout <seconds>` | `86400` | Sandbox timeout (default 24h) |
+| `--timeout <seconds>` | `3600` | Sandbox timeout (default 1h) |
 | `--env KEY` or `--env KEY=VAL` | — | Environment variable to forward (repeatable). `KEY` reads from host env; `KEY=VAL` sets explicitly. |
+| `--file LOCAL:REMOTE` | — | Upload a local file into the sandbox before starting (repeatable) |
 | `--verbose` | off | Diagnostic logging to stderr |
 
 ## Custom dependencies
