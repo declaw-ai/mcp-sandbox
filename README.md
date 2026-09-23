@@ -144,18 +144,25 @@ Network is deny-all by default. Use `--network-allow` to open specific hosts the
 
 ## Custom dependencies
 
-The default `mcp-server` template includes Node.js and Python, which covers most MCP servers. If your server needs additional system packages (e.g., `ffmpeg`, native libraries), build a custom template:
+The default `mcp-server` template includes Node.js and Python, which covers most MCP servers. If your server needs additional system packages (e.g., `ffmpeg`, `chromium`, native libraries), build a custom template (needs declaw CLI v0.8.0 or later):
 
 ```bash
-# Create a Dockerfile
-echo 'FROM declaw/mcp-server:latest
-RUN apt-get update && apt-get install -y ffmpeg' > Dockerfile
+# Create a Dockerfile: Node.js 20 and Python, plus what your server needs
+cat > Dockerfile <<'EOF'
+FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates curl python3 python3-pip ffmpeg \
+ && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+ && apt-get install -y nodejs \
+ && rm -rf /var/lib/apt/lists/*
+EOF
 
-# Build it (returns a template ID)
-declaw template build --dockerfile Dockerfile
+# Build it under a name of your choice; this waits for the build (usually several minutes)
+declaw template build --alias my-mcp --dockerfile Dockerfile
 
-# Use the template ID from the build output
-declaw mcp --template <template-id> -- your-server-command
+# Use it by that name
+declaw mcp --template my-mcp -- your-server-command
 ```
 
 See `declaw template build --help` for details.
